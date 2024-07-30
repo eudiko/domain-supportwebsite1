@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Map</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    
+    <style>
+        #map{
+            height:400px;
+            width:500px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+
+    </header>
+    <div id="map"></div>
+    <script>
+        const map = L.map('map').setView([20.5937, 78.9629], 2);
+
+        lat1 = 12.9296
+        lng1 = 77.6069
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+        {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}).addTo(map);
+
+        let userMarker;
+        let predefinedMarker = L.marker([lat1, lng1]).addTo(map).bindPopup('Our Office');
+
+        if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function (position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            userMarker = L.marker([lat, lng]).addTo(map).bindPopup('Your location')
+
+            
+            const bounds = L.latLngBounds([[lat, lng], [lat1, lng1]]);
+            map.fitBounds(bounds);
+            
+        });
+    } else{
+        error=>{
+            let msg="";
+                    switch(error.code){
+                        case error.PERMISSION_DENIED:
+                            msg="User Denied Permission";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            msg="Can't Locate User's Position";
+                            break;
+                        case error.TIMEOUT:
+                            msg="Time out";
+                            break;
+                    }
+        }
+    }
+    function openRandomPopup() {
+            // Close all popups first
+            if (userMarker) userMarker.closePopup();
+            predefinedMarker.closePopup();
+
+            // Randomly select one marker to open its popup
+            const random = Math.random();
+            if (random < 0.5 && userMarker) {
+                userMarker.openPopup();
+            } else {
+                predefinedMarker.openPopup();
+            }
+    }
+    setInterval(openRandomPopup, 3000);
+    </script>
+    <footer>
+
+    </footer>
+</body>
+</html>
